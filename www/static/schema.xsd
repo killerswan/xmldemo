@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="color" type="xs:string"/>
+
+  <xs:element name="number" type="xs:string"/>
+
+  <xs:element name="event">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="color"/>
+        <xs:element ref="number"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="label" type="xs:string"/>
+
+  <xs:attribute name="seqid" type="xs:string"/>
+
+  <xs:element name="colorseq">
+    <xs:complexType>
+      <xs:attribute ref="seqid"/>
+      <xs:sequence>
+        <xs:element ref="label"/>
+        <xs:element ref="event" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

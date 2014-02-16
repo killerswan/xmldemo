@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<colorseq seqid="1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="schema.xsd">
+
+  <label>alpha seq</label>
+
+  <event>
+    <color>#0ff</color>
+    <number>7</number>
+  </event>
+
+  <event>
+    <color>#0f0</color>
+    <number>21</number>
+  </event>
+
+  <event>
+    <color>#ff0</color>
+    <number>3</number>
+  </event>
+</colorseq>

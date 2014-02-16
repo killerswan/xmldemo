@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<colorseq seqid="2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="schema.xsd">
+
+  <label>beta seq</label>
+
+  <event>
+    <color>#0dd</color>
+    <number>7</number>
+  </event>
+
+  <event>
+    <color>#0d0</color>
+    <number>2</number>
+  </event>
+
+  <event>
+    <color>#dd0</color>
+    <number>14</number>
+  </event>
+</colorseq>
