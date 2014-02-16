@@ -2,9 +2,10 @@ pom.xml
 *jar
 /lib/
 /classes/
-/www/appdeps/
+/www/app/
 /www/app.js
 /target/
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
+.nrepl-port
