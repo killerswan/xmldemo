@@ -63,65 +63,70 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; XhrIo ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn fetch-success [ev]
+(defn fetch-success [ev ff]
   "handle a successful XhrIo fetch"
   (let [tgt (.-target ev)
         xml (. tgt (getResponseXml))
         txt (. xml (toString))
-        cs  (parseColorSeqXML xml)]
-    (. js/console (log "fetch success"))
-    ;(. js/console (log "ev: " ev))
-    ;(. js/console (log "tgt: " tgt))
-    ;(. js/console (log "xml: " xml))
-    ;(. js/console (log "txt: " txt))
-    (. js/console (log "color seq: " cs))))
+        cs  (parseColorSeqXML xml)
+        fcs (flattenColorEvents cs)]
+    (. js/console (log "fetch success: parsed colorseq"))
+    (ff fcs)
+    (. js/console (log "fetch success: done"))))
 
 
-(defn fetch [url]
+(defn fetch [url ff]
   "send an XhrIo request"
   (let [xhr (gnet/xhr-connection.)]
     (gevent/listen xhr :error #(. js/console (log "fetch error: " %1)))
-    (gevent/listen xhr :success fetch-success)
+    (gevent/listen xhr :success #(fetch-success %1 ff))
   (gnet/transmit xhr url "GET" {})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Om UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def app-state (atom {:list [{:seqid "7"
-                              :label "ok"
-                              :number "21"
-                              :color "#720"}]}))
+(def app-state
+  "our app's core state: a list of flattened events"
+  ;(atom {:list []})
+  (atom {:list [{:seqid "7"
+                 :label "ok"
+                 :number "21"
+                 :color "#720"}]}))
 
-(defn colorEventItem [ev]
-  (let [color (:color ev)
-        style #js {:color color}
-        seqid (:seqid ev)
-        label (:label ev)
+(defn colorItem [ev]
+  "make a <li> from a flattented event"
+  (let [color  (:color ev)
+        seqid  (:seqid ev)
+        label  (:label ev)
         number (:number ev)
-        text  (string/join " / " [seqid label number color])]
+        style  #js {:color color}
+        text   (string/join " / " [seqid label number color])]
     (dom/li #js {:style style} text)))
-
-
-;(. js/console (log (:seqid ({:seqid "7"}))))
 
 (defn widget [data owner]
   (dom/h1 nil "Color events")
-  (apply dom/ul nil (map colorEventItem (:list data))))
+  (apply dom/ul nil (map colorItem (:list data))))
 
-(om/root
-  widget
-  app-state
-  {:target (. js/document (getElementById "app"))})
-
-
-(fetch "/static/alpha.xml")
-(fetch "/static/beta.xml")
-
-;;(swap! app-state assoc :text "Hmmm.")
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Run ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (. js/console (log "@@@@@@@@@@@@@@@@@@@@@@@@@"))
 (. js/console (log "@@@@@@  XML Demo   @@@@@@"))
-(. js/console (log "@@@@@@ version 0.1 @@@@@@"))
+(. js/console (log "@@@@@@ version 0.2 @@@@@@"))
+
+(om/root widget app-state
+  {:target (. js/document (getElementById "app"))})
+
+(defn swap-conj! [state extra]
+  "add extra contents to the existing state list"
+  (let [old (:list state)
+        new (conj old extra)
+        showNum (fn [item] (. js/console (log (:number item))))]
+  (map showNum new)
+  (swap! state assoc :list new)))
 
 
+(fetch "/static/alpha.xml" #(swap-conj! app-state %1))
+;(fetch "/static/beta.xml"  #(swap-conj! app-state %1))
+
+;(swap! app-state assoc :text "Hmmm.")
