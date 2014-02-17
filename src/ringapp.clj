@@ -3,6 +3,8 @@
             [ring.middleware.file :as file]
             [ring.middleware.resource :as resource]
             [ring.util.response :as response]
+            [ring.middleware.content-type :as content-type]
+            [ring.util.mime-type :as mime]
             )
   (:gen-class))
 
@@ -13,14 +15,21 @@
    (str "<html>hello from <code>render-app</code>")})
 
 (defn handler [request]
-  (if (= "/help" (:uri request))
-      (response/redirect "/help.html")
+  (if (= "/banana" (:uri request))
+      (response/redirect "/index.html")
       (render-app)))
 
 (def app
   (-> handler
-      ;;(resource/wrap-resource "public")
-      (file/wrap-file "www")))
+      (file/wrap-file "www")
+      (content-type/wrap-content-type)
+      ; The fact that host:port/ only gets
+      ; an octet stream MIME type is infuriating!
+  ))
+
+;(resource/wrap-resource "public")
+;:mime-types mime/default-mime-types
+
 
 (defn -main [& args]
   (jetty/run-jetty app {:port 3000}))
