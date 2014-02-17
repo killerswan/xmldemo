@@ -41,23 +41,23 @@
 (defn parseEvent [node]
   "get a color,number pair out of an element"
   (let [itxt (fn [el] (getSubElementText node el))]
-    #{:color (itxt "color")
-      :number (itxt "number")}))
+    {:color (itxt "color")
+     :number (itxt "number")}))
 
 (defn parseColorSeqXML [doc]
   (let [label (getElementText doc "/colorseq/label")
         seqid (getAttribute doc "/colorseq" "seqid")
         colorseq (parseElements doc "/colorseq/event" parseEvent)]
-    #{:label label
-      :seqid seqid
-      :events colorseq}))
+    {:label label
+     :seqid seqid
+     :events colorseq}))
 
 (defn flattenColorEvents [colorSeq]
   (let [expand (fn [event]
-                 #{:color (:color event)
-                   :number (:number event)
-                   :label (:label colorSeq)
-                   :seqid (:seqid colorSeq)})]
+                 {:color (:color event)
+                  :number (:number event)
+                  :label (:label colorSeq)
+                  :seqid (:seqid colorSeq)})]
     (map expand (:events colorSeq))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,26 +87,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Om UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def app-state (atom {:list [#{:seqid "7"
-                               :label "ok"
-                               :number "21"
-                               :color "#720"}]}))
+(def app-state (atom {:list [{:seqid "7"
+                              :label "ok"
+                              :number "21"
+                              :color "#720"}]}))
 
 (defn colorEventItem [ev]
-  (let [color (:color ev)]
-    (dom/li #js{:style (:color color)}
-            "tmp2"
-            (comment str (:seqid ev) " / "
-                 (:label ev) " / "
-                 (:number ev) " / "
-                 (color))))
-    (comment dom/li nil "tmp"))
+  (let [color (:color ev)
+        style #js {:color color}
+        seqid (:seqid ev)
+        label (:label ev)
+        number (:number ev)
+        text  (string/join " / " [seqid label number color])]
+    (dom/li #js {:style style} text)))
 
+
+;(. js/console (log (:seqid ({:seqid "7"}))))
 
 (defn widget [data owner]
   (dom/h1 nil "Color events")
-  (apply dom/ul nil
-         (map colorEventItem (:list data))))
+  (apply dom/ul nil (map colorEventItem (:list data))))
 
 (om/root
   widget
