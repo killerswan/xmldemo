@@ -85,14 +85,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Om UI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def app-state
-  "our app's core state: a list of flattened events"
-  ;(atom {:list []})
-  (atom {:list [{:seqid "7"
-                 :label "ok"
-                 :number "21"
-                 :color "#720"}]}))
-
 (defn colorItem [ev]
   "make a <li> from a flattented event"
   (let [color  (:color ev)
@@ -105,28 +97,43 @@
 
 (defn widget [data owner]
   (dom/h1 nil "Color events")
-  (apply dom/ul nil (map colorItem (:list data))))
+  (apply dom/ul nil (map colorItem data)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Run ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (. js/console (log "@@@@@@@@@@@@@@@@@@@@@@@@@"))
 (. js/console (log "@@@@@@  XML Demo   @@@@@@"))
-(. js/console (log "@@@@@@ version 0.2 @@@@@@"))
+(. js/console (log "@@@@@@ version 0.4 @@@@@@"))
+
+(def app-state
+  "our app's core state: a list of flattened events"
+  ;(atom {:list []})
+  (atom [{:seqid "7"   :label "ok"
+          :number "21" :color "#720"}]))
 
 (om/root widget app-state
   {:target (. js/document (getElementById "app"))})
 
-(defn swap-conj! [state extra]
-  "add extra contents to the existing state list"
-  (let [old (:list state)
-        new (conj old extra)
-        showNum (fn [item] (. js/console (log (:number item))))]
-  (map showNum new)
-  (swap! state assoc :list new)))
+; this works
+(swap! app-state into
+       [{:seqid "8"   :label "ok"
+         :number "23" :color "#400"}])
 
+; ahhh, we have to use something like swap! to inspect atoms
+(comment
+ swap! app-state
+       (fn [xs]
+         (let [first (nth xs 0)
+               num   (:number first)]
+         (. js/console (log num))))
+       [])
 
-(fetch "/static/alpha.xml" #(swap-conj! app-state %1))
-;(fetch "/static/beta.xml"  #(swap-conj! app-state %1))
+(swap! app-state into
+       [{:seqid "9"   :label "whatever"
+         :number "89" :color "#580"}
+        {:seqid "10"  :label "yay"
+         :number "7"  :color "#f7f"}])
 
-;(swap! app-state assoc :text "Hmmm.")
+(fetch "/static/alpha.xml" #(swap! app-state into %1))
+(fetch "/static/beta.xml"  #(swap! app-state into %1))
