@@ -129,13 +129,14 @@
 (fetch "/static/beta.xml"  #(swap! app-state into %1))
 
 ; and this is a shoddy way to inspect an atom
-(swap! app-state
+(comment
+ swap! app-state
        (fn [xs]
          (let [first (nth xs 0)
                num   (:number first)]
            (. js/console (log num))
-           xs))
-       xs)
+           xs)
+       []))
 
 
 
