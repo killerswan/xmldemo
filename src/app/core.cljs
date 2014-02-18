@@ -54,10 +54,10 @@
 
 (defn flattenColorEvents [colorSeq]
   (let [expand (fn [event]
-                 {:color (:color event)
+                 {:color  (:color  event)
                   :number (:number event)
-                  :label (:label colorSeq)
-                  :seqid (:seqid colorSeq)})]
+                  :label  (:label  colorSeq)
+                  :seqid  (:seqid  colorSeq)})]
     (map expand (:events colorSeq))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -110,31 +110,32 @@
 (def app-state
   "our app's core state: a list of flattened events"
   ;(atom {:list []})
-  (atom [{:seqid "7"   :label "ok"
-          :number "21" :color "#720"}]))
+  (atom [{:seqid "7" :label "ok" :number "21" :color "#720"}]))
 
 (om/root widget app-state
   {:target (. js/document (getElementById "app"))})
 
 ; this works
 (swap! app-state into
-       [{:seqid "8"   :label "ok"
-         :number "23" :color "#400"}])
+       [{:seqid "8" :label "ok" :number "23" :color "#400"}])
 
-; ahhh, we have to use something like swap! to inspect atoms
-(comment
- swap! app-state
+; ahhh, we have to use something like swap! to change atoms
+(swap! app-state into
+       [{:seqid "9"  :label "whatever" :number "89" :color "#580"}
+        {:seqid "10" :label "yay"      :number "7"  :color "#f7f"}])
+
+; using callbacks like this is sketchy
+(fetch "/static/alpha.xml" #(swap! app-state into %1))
+(fetch "/static/beta.xml"  #(swap! app-state into %1))
+
+; and this is a shoddy way to inspect an atom
+(swap! app-state
        (fn [xs]
          (let [first (nth xs 0)
                num   (:number first)]
-         (. js/console (log num))))
-       [])
+           (. js/console (log num))
+           xs))
+       xs)
 
-(swap! app-state into
-       [{:seqid "9"   :label "whatever"
-         :number "89" :color "#580"}
-        {:seqid "10"  :label "yay"
-         :number "7"  :color "#f7f"}])
 
-(fetch "/static/alpha.xml" #(swap! app-state into %1))
-(fetch "/static/beta.xml"  #(swap! app-state into %1))
+
