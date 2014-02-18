@@ -65,13 +65,14 @@
 
 (defn fetch-success [ev ff]
   "handle a successful XhrIo fetch"
-  (let [tgt (.-target ev)
-        xml (. tgt (getResponseXml))
-        txt (. xml (toString))
-        cs  (parseColorSeqXML xml)
-        fcs (flattenColorEvents cs)]
-    (. js/console (log "fetch success: parsed colorseq"))
-    (ff fcs)
+  (let []
+    (->> ev
+         (.-target)
+         ;((fn [tgt] (. tgt (getResponseXml))))
+         (.getResponseXml)
+         (parseColorSeqXML)
+         (flattenColorEvents)
+         (ff))
     (. js/console (log "fetch success: done"))))
 
 
@@ -104,7 +105,7 @@
 
 (. js/console (log "@@@@@@@@@@@@@@@@@@@@@@@@@"))
 (. js/console (log "@@@@@@  XML Demo   @@@@@@"))
-(. js/console (log "@@@@@@ version 0.4 @@@@@@"))
+(. js/console (log "@@@@@@ version 0.6 @@@@@@"))
 
 (def app-state
   "our app's core state: a list of flattened events"
