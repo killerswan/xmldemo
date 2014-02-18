@@ -25,4 +25,8 @@
                 :optimizations :none
                 :source-map true}}]}
 
-  :ring {:handler ringapp/app})
+  :ring {:handler ringapp/app
+         :auto-reload? true
+         :auto-refresh? true ; noop when headless, I think
+         ;:port 4567
+         })
